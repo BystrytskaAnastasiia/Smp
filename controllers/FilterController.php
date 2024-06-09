@@ -7,6 +7,8 @@ class FilterController {
     }
 
     public function filter() {
+
+
         // Отримуємо параметри фільтрації з запиту
         $tags = isset($_GET['tags']) ? $_GET['tags'] : [];
         $minLikes = isset($_GET['minLikes']) ? $_GET['minLikes'] : null;

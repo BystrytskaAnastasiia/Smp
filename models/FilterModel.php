@@ -6,51 +6,39 @@ class FilterModel {
         $this->pdo = $database->getPdo();
     }
 
-    public function filterWorks($tags, $minLikes, $status, $free) {
-        // Будуємо SQL-запит залежно від переданих параметрів
+    public function filterWorks($tags, $minLikes, $status, $free = 1) {
+        // Начальный SQL-запрос
         $sql = 'SELECT * FROM work WHERE 1';
 
-        // Додаємо умову для фільтрації за тегами
+        // Условие для фильтрации по тегам
         if (!empty($tags)) {
-            $sql .= ' AND work_id IN (SELECT work_id FROM work_tags WHERE tags_id IN (SELECT tags_id FROM tags WHERE tags_text IN (' . implode(',', array_fill(0, count($tags), '?')) . ')))';
+            $tagsList = implode(',', array_map(function($tag) {
+                return $this->pdo->quote($tag);
+            }, $tags));
+            $sql .= " AND work_id IN (SELECT work_id FROM work_tags WHERE tags_id IN (SELECT tags_id FROM tags WHERE tags_text IN ($tagsList)))";
         }
 
-        // Додаємо умову для фільтрації за кількістю лайків
+        // Условие для фильтрации по количеству лайков
         if ($minLikes !== null) {
-            $sql .= ' AND number_of_likes >= ?';
+            $sql .= " AND number_of_likes >= " . (int)$minLikes;
         }
 
-        // Додаємо умову для фільтрації за статусом
-        if (!empty($status)) {
-            $sql .= ' AND status IN (' . implode(',', array_fill(0, count($status), '?')) . ')';
-        }
+        // Условие для фильтрации по статусу
 
-        // Додаємо умову для фільтрації за типом (платний / безкоштовний)
-        if (!empty($free)) {
-            $sql .= ' AND free = ?';
-        }
+            $sql .= " AND status = '$status'";
+        
+        
 
-        // Підготовлюємо запит до виконання
-        $stmt = $this->pdo->prepare($sql);
+        // Условие для фильтрации по типу (платный / бесплатный)
+        
+            $sql .= " AND free = $free";
+        
 
-        // Задаємо значення параметрів та виконуємо запит
-        $index = 1;
-        foreach ($tags as $tag) {
-            $stmt->bindValue($index++, $tag);
-        }
-        if ($minLikes !== null) {
-            $stmt->bindValue($index++, $minLikes, PDO::PARAM_INT);
-        }
-        if (!empty($status)) {
-            foreach ($status as $s) {
-                $stmt->bindValue($index++, $s);
-            }
-        }
-        if (!empty($free)) {
-            $stmt->bindValue($index++, $free);
-        }
+        echo $sql;
 
-        $stmt->execute();
+        // Выполнение запроса
+        $stmt = $this->pdo->query($sql);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

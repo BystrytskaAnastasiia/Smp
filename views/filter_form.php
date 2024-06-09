@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="uk">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +39,6 @@
         }
 
         label {
-            display: block;
             margin-bottom: 5px;
         }
 
@@ -88,51 +88,70 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Фільтрація Творів</h1>
     <form action="filter.php" method="GET">
         <div>
             <label for="tags">Теги:</label>
-            <select name="tags[]" id="tags" multiple>
-                <option value="романтика">Романтика</option>
-                <option value="жахи">Жахи</option>
-                <option value="комедія">Комедія</option>
-                <!-- Додайте інші теги за необхідністю -->
-            </select>
+            <div id="tags">
+                <?php
+                require_once 'config/Database.php';
+                $db = new Database();
+                $pdo = $db->getPdo(); // Исправлено с $database на $db
+                
+                $sql = 'SELECT tags_text FROM tags';
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute();
+
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($data as $row) {
+                    $tagText = htmlspecialchars($row['tags_text']);
+                    echo "<label><input type=\"checkbox\" name=\"tags[]\" value=\"$tagText\"> $tagText</label><br>";
+                }
+                ?>
+            </div>
+
         </div>
         <div>
             <label for="minLikes">Мінімальна Кількість Лайків:</label>
             <input type="number" id="minLikes" name="minLikes" min="0">
         </div>
         <div>
-            <label for="status">Статус:</label>
-            <select name="status[]" id="status" multiple>
-                <option value="заморожений">Заморожений</option>
-                <option value="в процесі">В процесі</option>
-                <option value="завершений">Завершений</option>
-            </select>
+            <label for="status">Статус:</label><br>
+            <input type="radio" id="frozen" name="status" value="заморожений">
+            <label for="frozen">Заморожений</label><br>
+
+            <input type="radio" id="in_process" name="status" value="в процесі" checked>
+            <label for="in_process">В процесі</label><br>
+
+            <input type="radio" id="completed" name="status" value="завершений">
+            <label for="completed">Завершений</label><br><br>
+
         </div>
         <div>
-            <label for="free">Безкоштовно:</label>
-            <select name="free" id="free">
-                <option value="1">Так</option>
-                <option value="0">Ні</option>
-            </select>
+            <label for="free">Безкоштовно:</label><br>
+            <input type="radio" id="free" name="free" value="1" checked>
+            <label for="free">Так</label><br>
+            <input type="radio" id="free" name="free" value="0" >
+            <label for="free">Ні</label><br>
         </div>
         <button type="submit">Фільтрувати</button>
     </form>
     <div class="works-container">
-    <?php if (!empty($filteredWorks)): ?>
-        <?php foreach ($filteredWorks as $work): ?>
-            <div class="work-card">
-                <h2><?php echo htmlspecialchars($work['title']); ?></h2>
-                <p><?php echo htmlspecialchars($work['description']); ?></p>
-                <!-- Додайте інші дані твору за необхідністю -->
-            </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <p>Немає творів, що відповідають вибраним критеріям фільтрації.</p>
-    <?php endif; ?>
-</div>
+        <?php if (!empty($filteredWorks)): ?>
+            <?php foreach ($filteredWorks as $work): ?>
+                <div class="work-card">
+                    <h2><?php echo htmlspecialchars($work['title']); ?></h2>
+                    <p><?php echo htmlspecialchars($work['description']); ?></p>
+                    <!-- Додайте інші дані твору за необхідністю -->
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>Немає творів, що відповідають вибраним критеріям фільтрації.</p>
+        <?php endif; ?>
+    </div>
 </body>
+
 </html>
