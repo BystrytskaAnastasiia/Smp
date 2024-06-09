@@ -200,8 +200,10 @@ img {
                     <?php foreach ($works as $work): ?>
                         <li>
                             <h3><?php echo htmlspecialchars($work['title']); ?></h3>
-                            <!-- Додана кнопка "Редагувати твір" -->
-                            <a href="view/  edit_work_form.php?work_id=<?php echo $work['work_id']; ?>">Редагувати твір</a>
+                            <a href="edit_work.php?work_id=<?php echo $work['work_id']; ?>">Редагувати твір</a>
+                           
+                          
+                            <a href="addchapter.php?action=add_chapter_form&work_id=<?php echo htmlspecialchars($work['work_id']); ?>">Додати главу</a>
                             <p>Age Rating: <?php echo htmlspecialchars($work['age_rating']); ?></p>
                             <p>Description: <?php echo nl2br(htmlspecialchars($work['description'])); ?></p>
                             <img src="<?php echo htmlspecialchars($work['cover']); ?>" alt="Cover Image" width="150">
@@ -229,4 +231,5 @@ img {
             </div>
         <?php endif; ?>
     </div>
+    
 </body>

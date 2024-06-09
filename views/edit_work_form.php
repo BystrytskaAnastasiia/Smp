@@ -145,7 +145,9 @@
 <body>
     <div class="container">
         <h1>Редагувати твір</h1>
-        <form action="" method="POST" enctype="multipart/form-data">
+        <form action="edit_work.php" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="work_id" value="<?php echo htmlspecialchars($work['work_id']); ?>">
+
             <div class="author-info">
                 <label for="nick_name">Автор:</label><br>
                 <h2><?php echo htmlspecialchars($user['nick_name']); ?></h2>
@@ -169,7 +171,7 @@
             <label for="tags">Теги:</label><br>
             <select name="tags[]" id="tags" multiple required>
                 <?php foreach ($tags as $tag): ?>
-                    <option value="<?php echo $tag['tags_id']; ?>"><?php echo $tag['tags_text']; ?></option>
+                    <option value="<?php echo $tag['tags_id']; ?>" <?php if (in_array($tag['tags_id'], array_column($workTags, 'tags_id'))) echo 'selected'; ?>><?php echo $tag['tags_text']; ?></option>
                 <?php endforeach; ?>
             </select><br><br>
 
@@ -189,61 +191,68 @@
                 <option value="1" <?php if ($work['free'] == 1) echo 'selected'; ?>>Безкоштовний</option>
                 <option value="0" <?php if ($work['free'] == 0) echo 'selected'; ?>>Платний</option>
             </select><br><br>
-
-            <label for="chapter_number">Нумерація глави:</label><br>
-            <input type="text" id="chapter_number" name="chapter_number" value="<?php echo htmlspecialchars($work['chapter_number']); ?>" required><br><br>
-
+            
             <label for="publish_date">Дата публікації:</label><br>
             <input type="date" id="publish_date" name="publish_date" value="<?php echo htmlspecialchars($work['date_of_publication']); ?>" required><br><br>
-
-            <label for="content">Вміст твору:</label><br>
-            <textarea id="content" name="content" rows="8" required><?php echo htmlspecialchars($work['content']); ?></textarea><br><br>
-
-            <button type="submit">Зберегісти зміни</button>
-</form>
-</div>
-<div class="editor-functions">
-<label for="font_size">Розмір шрифта:</label>
-<select name="font_size" id="font_size" onchange="applyFontStyles()">
-<option value="10px">10px</option>
-<option value="12px">12px</option>
-<option value="14px">14px</option>
-<!-- Додайте інші розміри шрифту за потреби -->
-</select>
-<label for="font_family">Шрифт:</label>
-    <select name="font_family" id="font_family" onchange="applyFontStyles()">
-        <option value="Arial">Arial</option>
-        <option value="Helvetica">Helvetica</option>
-        <option value="Times New Roman">Times New Roman</option>
-        <option value="Courier New">Courier New</option>
-        <option value="Verdana">Verdana</option>
-        <option value="Georgia">Georgia</option>
-        <option value="Palatino">Palatino</option>
-        <option value="Garamond">Garamond</option>
-        <option value="Comic Sans MS">Comic Sans MS</option>
-        <option value="Impact">Impact</option>
-        <!-- Додайте інші шрифти за потреби -->
-    </select>
-
-    <input type="button" value="Ліве вирівнювання" onclick="applyTextAlignment('left');">
-    <input type="button" value="Центральне вирівнювання" onclick="applyTextAlignment('center');">
-    <input type="button" value="Праве вирівнювання" onclick="applyTextAlignment('right');">
-
-    <input type="button" value="Підкреслений" onclick="document.getElementById('content').style.textDecoration = 'underline';">
-    <input type="button" value="Курсив" onclick="document.getElementById('content').style.fontStyle = 'italic';">
-    <input type="button" value="Жирний" onclick="document.getElementById('content').style.fontWeight = 'bold';">
-</div>
+            
+            <?php foreach ($chapters as $index => $chapter): ?>
+                <div class="chapter">
+                    <input type="hidden" name="chapter_id[]" value="<?php echo htmlspecialchars($chapter['chapter_id']); ?>">
+                    <label for="chapter_number_<?php echo $index; ?>">Номер глави:</label>
+                    <input type="text" id="chapter_number_<?php echo $index; ?>" name="chapter_number[]" value="<?php echo htmlspecialchars($chapter['chapter_number']); ?>" required>
+                    
+                    <label for="content_<?php echo $index; ?>">Вміст глави:</label>
+                    <textarea id="content_<?php echo $index; ?>" name="content[]" rows="6" cols="50"><?php echo htmlspecialchars($chapter['content']); ?></textarea>
+                </div>
+            <?php endforeach; ?>
+            
+            <button type="submit">Зберегти зміни</button>
+        </form>
+    </div>
+    
+    <div class="editor-functions">
+        <label for="font_size">Розмір шрифта:</label>
+        <select name="font_size" id="font_size" onchange="applyFontStyles()">
+            <option value="10px">10px</option>
+            <option value="12px">12px</option>
+            <option value="14px">14px</option>
+            <option value="16px">16px</option>
+            <option value="18px">18px</option>
+        </select>
+        
+        <label for="line_height">Висота рядка:</label>
+        <select name="line_height" id="line_height" onchange="applyFontStyles()">
+            <option value="1">1</option>
+            <option value="1.5">1.5</option>
+            <option value="2">2</option>
+            <option value="2.5">2.5</option>
+            <option value="3">3</option>
+        </select>
+        
+        <label for="font_family">Стиль шрифта:</label>
+        <select name="font_family" id="font_family" onchange="applyFontStyles()">
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+        </select>
+    </div>
+    
+    <script>
+        function applyFontStyles() {
+            var fontSize = document.getElementById("font_size").value;
+            var lineHeight = document.getElementById("line_height").value;
+            var fontFamily = document.getElementById("font_family").value;
+            
+            var textAreas = document.getElementsByTagName("textarea");
+            for (var i = 0; i < textAreas.length; i++) {
+                textAreas[i].style.fontSize = fontSize;
+                textAreas[i].style.lineHeight = lineHeight;
+                textAreas[i].style.fontFamily = fontFamily;
+            }
+        }
+    </script>
 </body>
 </html>
-<script>
-   
-    function applyFontStyles() {
-        var fontSize = document.getElementById("font_size").value;
-        var fontFamily = document.getElementById("font_family").value;
-        document.getElementById("content").style.fontSize = fontSize;
-        document.getElementById("content").style.fontFamily = fontFamily;
-    }
-    function applyTextAlignment(align) {
-    document.getElementById("content").style.textAlign = align;
-}
-</script>
+

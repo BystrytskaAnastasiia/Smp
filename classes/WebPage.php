@@ -31,6 +31,8 @@ abstract class WebPage {
                     <ul>
                         <li><a href='index.php'>Головна</a></li>
                         <li><a href='work.php'>Твори</a></li>
+                   
+
                         $loginText
                     </ul>
                 </nav>

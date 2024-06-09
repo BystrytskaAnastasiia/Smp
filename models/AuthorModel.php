@@ -29,10 +29,7 @@ class AuthorModel {
     }
     
 
-    public function addChapter($workId, $chapterNumber, $status, $content, $publishDate) {
-        $stmt = $this->pdo->prepare('INSERT INTO chapters (chapter_number, status, content, date_of_publication, work_id) VALUES (?, ?, ?, ?, ?)');
-        $stmt->execute([$chapterNumber, $status, $content, $publishDate, $workId]);
-    }
+
 
     public function addWorkTags($workId, $tags) {
         foreach ($tags as $tagId) {
@@ -46,19 +43,19 @@ class AuthorModel {
         // Поверніть true, якщо оновлення пройшло успішно, інакше поверніть false
         return $stmt->rowCount() > 0;
     }
-
+    
     public function updateChapter($chapterId, $chapterNumber, $status, $content, $publishDate) {
         $stmt = $this->pdo->prepare('UPDATE chapters SET chapter_number = ?, status = ?, content = ?, date_of_publication = ? WHERE chapter_id = ?');
         $stmt->execute([$chapterNumber, $status, $content, $publishDate, $chapterId]);
         // Поверніть true, якщо оновлення пройшло успішно, інакше поверніть false
         return $stmt->rowCount() > 0;
     }
-
+    
     public function updateWorkTags($workId, $tags) {
         // Спочатку видаліть старі теги для цього твору
         $stmt = $this->pdo->prepare('DELETE FROM work_tags WHERE work_id = ?');
         $stmt->execute([$workId]);
-
+    
         // Потім додайте нові теги
         foreach ($tags as $tagId) {
             $stmt = $this->pdo->prepare('INSERT INTO work_tags (work_id, tags_id) VALUES (?, ?)');
@@ -67,6 +64,7 @@ class AuthorModel {
         // Поверніть true, якщо оновлення пройшло успішно, інакше поверніть false
         return true;
     }
+    
     public function getUserById($userId) {
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE user_id = ?');
         $stmt->execute([$userId]);
@@ -77,5 +75,30 @@ class AuthorModel {
         $stmt->execute(['work_id' => $work_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    public function getChaptersByWorkId($workId) {
+        $stmt = $this->pdo->prepare('SELECT * FROM chapters WHERE work_id = ?');
+        $stmt->execute([$workId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getWorkTags($workId) {
+        $stmt = $this->pdo->prepare('SELECT tags_id FROM work_tags WHERE work_id = ?');
+        $stmt->execute([$workId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+   
+    public function addChapter($workId, $chapterNumber, $status, $content, $publishDate) {
+        try {
+            $this->pdo->beginTransaction();
+    
+            $stmt = $this->pdo->prepare('INSERT INTO chapters (chapter_number, status, content, date_of_publication, work_id) VALUES (?, ?, ?, ?, ?)');
+            $stmt->execute([$chapterNumber, $status, $content, $publishDate, $workId]);
+    
+            $this->pdo->commit();
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
+    }
+    
 }
 ?>

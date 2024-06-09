@@ -150,14 +150,6 @@
                 <label for="nick_name">Автор:</label><br>
                 <h2><?php echo htmlspecialchars($user['nick_name']); ?></h2>
             </div>
-            <?php foreach ($userWorks as $work): ?>
-    <div class="work">
-        <h2><?php echo htmlspecialchars($work['title']); ?></h2>
-        <p><?php echo htmlspecialchars($work['description']); ?></p>
-        
-        <a href="edit.php?work_id=<?php echo $work['work_id']; ?>">Редагувати твір</a>
-    </div>
-<?php endforeach; ?>
 
             <label for="title">Назва:</label><br>
             <input type="text" id="title" name="title" required><br><br>
@@ -210,38 +202,39 @@
         </form>
     </div>
     <div class="editor-functions">
-                <label for="font_size">Розмір шрифта:</label>
-                <select name="font_size" id="font_size" onchange="applyFontStyles()">
-                    <option value="10px">10px</option>
-                    <option value="12px">12px</option>
-                    <option value="14px">14px</option>
-                    <!-- Додайте інші розміри шрифту за потреби -->
-                </select>
+        <label for="font_size">Розмір шрифта:</label>
+        <select name="font_size" id="font_size" onchange="applyFontStyles()">
+            <option value="10px">10px</option>
+            <option value="12px">12px</option>
+            <option value="14px">14px</option>
+            <!-- Додайте інші розміри шрифту за потреби -->
+        </select>
 
-                <label for="font_family">Шрифт:</label>
-                <select name="font_family" id="font_family" onchange="applyFontStyles()">
-                    <option value="Arial">Arial</option>
-                    <option value="Helvetica">Helvetica</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="Verdana">Verdana</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Palatino">Palatino</option>
-                    <option value="Garamond">Garamond</option>
-                    <option value="Comic Sans MS">Comic Sans MS</option>
-                    <option value="Impact">Impact</option>
-                    <!-- Додайте інші шрифти за потреби -->
-                </select>
+        <label for="font_family">Шрифт:</label>
+        <select name="font_family" id="font_family" onchange="applyFontStyles()">
+            <option value="Arial">Arial</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Palatino">Palatino</option>
+            <option value="Garamond">Garamond</option>
+            <option value="Comic Sans MS">Comic Sans MS</option>
+            <option value="Impact">Impact</option>
+            <!-- Додайте інші шрифти за потреби -->
+        </select>
 
-                <input type="button" value="Ліве вирівнювання" onclick="applyTextAlignment('left');">
-                <input type="button" value="Центральне вирівнювання" onclick="applyTextAlignment('center');">
-                <input type="button" value="Праве вирівнювання" onclick="applyTextAlignment('right');">
+        <input type="button" value="Ліве вирівнювання" onclick="applyTextAlignment('left');">
+        <input type="button" value="Центральне вирівнювання" onclick="applyTextAlignment('center');">
+        <input type="button" value="Праве вирівнювання" onclick="applyTextAlignment('right');">
 
-                <input type="button" value="Підкреслений" onclick="document.getElementById('content').style.textDecoration = 'underline';">
-                <input type="button" value="Курсив" onclick="document.getElementById('content').style.fontStyle = 'italic';">
-                <input type="button" value="Жирний" onclick="document.getElementById('content').style.fontWeight = 'bold';">
-            </div>
+        <input type="button" value="Підкреслений" onclick="document.getElementById('content').style.textDecoration = 'underline';">
+        <input type="button" value="Курсив" onclick="document.getElementById('content').style.fontStyle = 'italic';">
+        <input type="button" value="Жирний" onclick="document.getElementById('content').style.fontWeight = 'bold';">
+    </div>
 </body>
+
 </html>
 <script>
         // Функція, яка застосовує обрані параметри шрифту до текстового поля

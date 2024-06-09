@@ -1,12 +1,13 @@
 <?php
-require_once 'classes/WebPage.php';
-
 class HomePage extends WebPage {
+    private $pdo;
     private $popularWorks;
     private $newWorks;
+    private $searchResults;
 
-    public function __construct($title, $popularWorks, $newWorks) {
+    public function __construct($title, $pdo, $popularWorks, $newWorks) {
         parent::__construct($title);
+        $this->pdo = $pdo; // Передаємо об'єкт з'єднання з базою даних
         $this->popularWorks = $popularWorks;
         $this->newWorks = $newWorks;
     }
@@ -14,8 +15,12 @@ class HomePage extends WebPage {
     protected function renderContent() {
         $this->renderGreeting();
         $this->renderSearchForm();
-        $this->renderPopularWorksSection();
-        $this->renderNewWorksSection();
+        if ($this->searchResults) {
+            $this->renderSearchResults();
+        } else {
+            $this->renderPopularWorksSection();
+            $this->renderNewWorksSection();
+        }
     }
 
     private function renderGreeting() {
@@ -25,13 +30,13 @@ class HomePage extends WebPage {
 
     private function renderSearchForm() {
         echo '<div class="search-form">';
-        echo '<form action="search.php" method="get">';
+        echo '<form action="" method="get">';
         echo '<input type="text" name="query" placeholder="Пошук творів..." class="search-input">';
         echo '<button type="submit" class="search-button">Пошук</button>';
         echo '</form>';
         echo '</div>';
     }
-
+    
     private function renderPopularWorksSection() {
         echo '<section>';
         echo '<h2>Популярні твори</h2>';
@@ -60,12 +65,21 @@ class HomePage extends WebPage {
         echo '<p>Дата публікації: ' . htmlspecialchars($work['date_of_publication']) . '</p>';
         echo '<p>Кількість лайків: ' . htmlspecialchars($work['number_of_likes']) . '</p>';
         echo '<p>' . ($work['free'] ? 'Безкоштовно' : 'Платно') . '</p>';
-        
-        
         echo '<p><a href="profile.php?user_id=' . $work['user_id'] . '">Переглянути профіль користувача</a></p>';
-        
         echo '</div>';
     }
-    
+
+    private function renderSearchResults() {
+        echo '<section>';
+        echo '<h2>Результати пошуку</h2>';
+        foreach ($this->searchResults as $work) {
+            $this->renderWork($work);
+        }
+        echo '</section>';
+    }
+
+    public function setSearchResults($searchResults) {
+        $this->searchResults = $searchResults;
+    }
 }
 ?>

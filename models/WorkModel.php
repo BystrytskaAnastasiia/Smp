@@ -77,7 +77,19 @@ class WorkModel {
         }
     }
     
-  
+    public function searchWorks($query) {
+        try {
+            // Підготовка SQL-запиту для пошуку творів, можливо використання LIKE для часткового відповідності
+            $stmt = $this->pdo->prepare("SELECT * FROM work WHERE title LIKE ? OR description LIKE ?");
+            $stmt->execute(["%$query%", "%$query%"]);
+            
+            // Повернення результатів
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Обробка помилки
+            throw new Exception("Помилка під час пошуку творів: " . $e->getMessage());
+        }
+    }
 // Додамо метод для отримання збірників користувача з бази даних
 
     
