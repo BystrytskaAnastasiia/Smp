@@ -24,17 +24,16 @@ class FilterModel {
         }
 
         // Условие для фильтрации по статусу
-
-            $sql .= " AND status = '$status'";
-        
-        
+        if (!empty($status)) { // Check if $status is not empty
+            $status = $this->pdo->quote($status); // Quote the status value
+            $sql .= " AND status = $status";
+        }
 
         // Условие для фильтрации по типу (платный / бесплатный)
-        
-            $sql .= " AND free = $free";
-        
+        $free = (int)$free; // Ensure $free is an integer
+        $sql .= " AND free = $free";
 
-        echo $sql;
+        // echo $sql; // Uncomment for debugging
 
         // Выполнение запроса
         $stmt = $this->pdo->query($sql);

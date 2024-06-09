@@ -31,8 +31,15 @@ abstract class WebPage {
                     <ul>
                         <li><a href='index.php'>Головна</a></li>
                         <li><a href='work.php'>Твори</a></li>
-                   
-
+                        <li class='dropdown'>
+                            <a href='#' class='dropdown-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Завдання(3) <span class='caret'></span></a>
+                            <ul class='dropdown-menu'>
+                                <li><a href='vstavka.php'>вставки в базу з використанням підготовлених
+запитів</a></li>
+                                <li><a href='ReviewD5.php'>завдання 5</a></li>
+                                 <li><a href='htmlconverter.php'>завдання 6</a></li>
+                            </ul>
+                        </li>
                         $loginText
                     </ul>
                 </nav>

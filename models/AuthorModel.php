@@ -8,7 +8,9 @@ class AuthorModel {
         $database = new Database();
         $this->pdo = $database->getPdo();
     }
-
+    public function getPdo() {
+        return $this->pdo;
+    }
     public function getAllTags() {
         $stmt = $this->pdo->query('SELECT * FROM tags');
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -29,7 +31,10 @@ class AuthorModel {
     }
     
 
-
+    public function addChapter($workId, $chapterNumber, $status, $content, $publishDate) {
+        $stmt = $this->pdo->prepare('INSERT INTO chapters (chapter_number, status, content, date_of_publication, work_id) VALUES (?, ?, ?, ?, ?)');
+        $stmt->execute([$chapterNumber, $status, $content, $publishDate, $workId]);
+    }
 
     public function addWorkTags($workId, $tags) {
         foreach ($tags as $tagId) {
@@ -70,11 +75,12 @@ class AuthorModel {
         $stmt->execute([$userId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    public function getWorkById($work_id) {
-        $stmt = $this->pdo->prepare('SELECT * FROM work WHERE work_id = :work_id');
-        $stmt->execute(['work_id' => $work_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function getWorksByUserId($user_id) {
+        $stmt = $this->pdo->prepare('SELECT * FROM work WHERE user_id = :user_id');
+        $stmt->execute(['user_id' => $user_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     public function getChaptersByWorkId($workId) {
         $stmt = $this->pdo->prepare('SELECT * FROM chapters WHERE work_id = ?');
         $stmt->execute([$workId]);
@@ -85,20 +91,6 @@ class AuthorModel {
         $stmt->execute([$workId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-   
-    public function addChapter($workId, $chapterNumber, $status, $content, $publishDate) {
-        try {
-            $this->pdo->beginTransaction();
-    
-            $stmt = $this->pdo->prepare('INSERT INTO chapters (chapter_number, status, content, date_of_publication, work_id) VALUES (?, ?, ?, ?, ?)');
-            $stmt->execute([$chapterNumber, $status, $content, $publishDate, $workId]);
-    
-            $this->pdo->commit();
-        } catch (Exception $e) {
-            $this->pdo->rollBack();
-            throw $e;
-        }
-    }
-    
+
 }
 ?>
