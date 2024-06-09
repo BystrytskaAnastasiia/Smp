@@ -1,5 +1,6 @@
 <?php
-require_once 'models\HTMLConverter.php';
+require_once __DIR__ . '/models/HTMLConverter.php';
+
 
 $converter = new HTMLConverter();
 $message = "";
